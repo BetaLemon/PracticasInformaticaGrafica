@@ -12,11 +12,11 @@
 #include <gtc\type_ptr.hpp>
 
 using namespace std;
+using namespace glm;
 const GLint WIDTH = 800, HEIGHT = 600;
 bool WIREFRAME = false;
 GLfloat mixValue = 0.2f;
-GLfloat angle = 0;
-
+GLfloat rotateValue = 0;
 const GLchar* vertexPath = "./src/SimpleVertexShader.vertexshader";
 const GLchar* fragmentPath = "./src/SimpleFragmentShader.fragmentshader";
 
@@ -224,22 +224,22 @@ int main() {
 		//establecer el shader
 		//glUseProgram(programID);
 
-		shader.USE();
-
-		// Ejercicio 1:
-		/*glm::mat4 trans;
-		trans = glm::scale(trans, glm::vec3(0.5f, -0.5f, 0));
-		trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.0f));*/
-		// Se ve invertido porque estamos escalando a números negativos.
-
-		// Ejercicio 2:
+		//glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
 		glm::mat4 trans;
-		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0));
-		trans = glm::translate(trans, glm::vec3(0.5f, 0.5f, 0.0f));
-		trans = glm::rotate(trans, (GLfloat)glm::radians(angle), glm::vec3(0, 0, 1));
 
+		//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	// Vec is 0,0,1 because we want to rotate on the Z-axis.
+		// Ejercicio 1:
+		//trans = glm::scale(trans, glm::vec3(0.5, -0.5, 1.0));
+		//trans = glm::translate(trans, glm::vec3(0.5, 0.5, 0));
+
+		// Ejercicio 2
+		trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
+		trans = glm::translate(trans, glm::vec3(0.5, 0.5, 1.0));
+		trans = glm::rotate(trans, glm::radians(rotateValue), glm::vec3(0.0, 0.0, 1.0));
 		GLuint transformLoc = glGetUniformLocation(shader.Program, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));	// value_ptr és per a que OpenGL entengui la matriu de GLM
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));	// where, how many, transposed?, matrix data.
+
+		shader.USE();
 
 		//pintar el VAO
 		glActiveTexture(GL_TEXTURE0);
@@ -300,10 +300,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
-		angle += 10;
+		rotateValue+=2;
 	}
-	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS )
 	{
-		angle -= 10;
+		rotateValue-=2;
 	}
 }
