@@ -17,6 +17,8 @@ const GLint WIDTH = 800, HEIGHT = 600;
 bool WIREFRAME = false;
 GLfloat mixValue = 0.2f;
 GLfloat rotateValue = 0;
+GLfloat cubeAngleX = 0.0f;
+GLfloat cubeAngleY = 0.0f;
 const GLchar* vertexPath = "./src/SimpleVertexShader.vertexshader";
 const GLchar* fragmentPath = "./src/SimpleFragmentShader.fragmentshader";
 
@@ -64,6 +66,116 @@ int main() {
 	
 	// creamos el shader:
 	Shader shader = Shader::Shader(vertexPath, fragmentPath);
+
+
+	GLfloat VertexBufferCube[] = {	//VBO	
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f , -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f , -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f , -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f , -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f , -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f , -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f , -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f , -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f ,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f ,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
+	vec3 CubesPositionBuffer[] = {
+		vec3(0.0f ,  0.0f,  0.0f),
+		vec3(2.0f ,  5.0f, -15.0f),
+		vec3(-1.5f, -2.2f, -2.5f),
+		vec3(-3.8f, -2.0f, -12.3f),
+		vec3(2.4f , -0.4f, -3.5f),
+		vec3(-1.7f,  3.0f, -7.5f),
+		vec3(1.3f , -2.0f, -2.5f),
+		vec3(1.5f ,  2.0f, -2.5f),
+		vec3(1.5f ,  0.2f, -1.5f),
+		vec3(-1.3f,  1.0f, -1.5f)
+	};
+
+	// Crear los VBO, VAO y EBO
+	GLuint VBO;
+	//GLuint EBO;
+	GLuint VAO;
+
+	//reservar memoria para el VAO, VBO y EBO
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	//glGenBuffers(1, &EBO);
+
+	//Establecer el objeto
+	glBindVertexArray(VAO);
+	//Declarar el VBO y el EBO - wut??
+
+	//Enlazar el buffer con openGL
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(VertexBufferObject), VertexBufferObject, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexBufferCube), VertexBufferCube, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(
+		0, // index, which attribute
+		3, // number of component per vertex attribute. Each coordinate contains 3 component
+		GL_FLOAT, // data type of each component
+		GL_FALSE, // need to be normalized ?
+		5 * sizeof(GLfloat),  // stride, 0 -> compact, OpenGL will compute it. non-zero --> number of bytes between two consecutive vertices
+		(GLvoid*)0);   // offset
+
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(
+		2, // index, which attribute
+		2, // number of component per vertex attribute. Each coordinate contains 3 component
+		GL_FLOAT, // data type of each component
+		GL_FALSE, // need to be normalized ?
+		5 * sizeof(GLfloat),  // stride, 0 -> compact, OpenGL will compute it. non-zero --> number of bytes between two consecutive vertices
+		(GLvoid*)(3*sizeof(GLfloat)));   // offset
+
+	glEnableVertexAttribArray(2);
+
+	//glVertexAttribPointer(
+	//	2, // index, which attribute
+	//	2, // number of component per vertex attribute. Each coordinate contains 3 component
+	//	GL_FLOAT, // data type of each component
+	//	GL_FALSE, // need to be normalized ?
+	//	8 * sizeof(GLfloat),  // stride, 0 -> compact, OpenGL will compute it. non-zero --> number of bytes between two consecutive vertices
+	//	reinterpret_cast<GLvoid*>(6 * sizeof(GLfloat)));   // offset
+
+	//glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
+
 	
 	// TEXTURA 1:
 	// creamos la textura:
@@ -113,98 +225,6 @@ int main() {
 	SOIL_free_image_data(image2);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
-	//fondo
-	//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-	//cargamos los shader
-	//GLuint programID = LoadShader("./src/SimpleVertexShader.vertexshader", "./src/SimpleFragmentShader.fragmentshader");
-
-	// Definir el VBO
-	GLfloat VertexBufferObject[] = {
-		// Positions          // Colors           // Texture Coords
-		0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // Top Right
-		0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // Bottom Right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // Bottom Left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // Top Left 
-	};
-
-	// Definir el EBO
-	GLuint IndexBufferObject[] = {
-		0, 3, 2,
-		2, 1, 0
-	};
-
-	// Crear los VBO, VAO y EBO
-	GLuint VBO;
-	GLuint EBO;
-	GLuint VAO;
-
-	//reservar memoria para el VAO, VBO y EBO
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-
-	//Establecer el objeto
-	glBindVertexArray(VAO);
-	//Declarar el VBO y el EBO - wut??
-
-	//Enlazar el buffer con openGL
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexBufferObject), VertexBufferObject, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(IndexBufferObject), IndexBufferObject, GL_STATIC_DRAW);
-	/*
-	//Establecer las propiedades de los vertices
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	//liberar el buffer
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	//liberar el buffer de vertices
-	glBindVertexArray(0);
-	
-	// Generamos la texture:
-	
-	
-
-	// Aplicamos las texturas:
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);*/
-
-	glVertexAttribPointer(
-		0, // index, which attribute
-		3, // number of component per vertex attribute. Each coordinate contains 3 component
-		GL_FLOAT, // data type of each component
-		GL_FALSE, // need to be normalized ?
-		8 * sizeof(GLfloat),  // stride, 0 -> compact, OpenGL will compute it. non-zero --> number of bytes between two consecutive vertices
-		nullptr);   // offset
-
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(
-		1, // index, which attribute
-		3, // number of component per vertex attribute. Each coordinate contains 3 component
-		GL_FLOAT, // data type of each component
-		GL_FALSE, // need to be normalized ?
-		8 * sizeof(GLfloat),  // stride, 0 -> compact, OpenGL will compute it. non-zero --> number of bytes between two consecutive vertices
-		reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));   // offset
-
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(
-		2, // index, which attribute
-		2, // number of component per vertex attribute. Each coordinate contains 3 component
-		GL_FLOAT, // data type of each component
-		GL_FALSE, // need to be normalized ?
-		8 * sizeof(GLfloat),  // stride, 0 -> compact, OpenGL will compute it. non-zero --> number of bytes between two consecutive vertices
-		reinterpret_cast<GLvoid*>(6 * sizeof(GLfloat)));   // offset
-
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);
 
 	//bucle de dibujado
 	while (!glfwWindowShouldClose(window))
@@ -216,30 +236,15 @@ int main() {
 		//glCullFace(GL_BACK);
 		//glFrontFace(GL_CCW);
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//Establecer el color de fondo
-		glClearColor(1.0, 1.0, 1.0, 1.0);
+		glClearColor(0, 0, 0, 1.0);
 
 		//establecer el shader
 		//glUseProgram(programID);
-
-		//glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-		glm::mat4 trans;
-
-		//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	// Vec is 0,0,1 because we want to rotate on the Z-axis.
-		// Ejercicio 1:
-		//trans = glm::scale(trans, glm::vec3(0.5, -0.5, 1.0));
-		//trans = glm::translate(trans, glm::vec3(0.5, 0.5, 0));
-
-		// Ejercicio 2
-		trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
-		trans = glm::translate(trans, glm::vec3(0.5, 0.5, 1.0));
-		trans = glm::rotate(trans, glm::radians(rotateValue), glm::vec3(0.0, 0.0, 1.0));
-		GLuint transformLoc = glGetUniformLocation(shader.Program, "transform");
-		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));	// where, how many, transposed?, matrix data.
-
-		shader.USE();
 
 		//pintar el VAO
 		glActiveTexture(GL_TEXTURE0);
@@ -250,19 +255,65 @@ int main() {
 		glUniform1i(glGetUniformLocation(shader.Program, "ourTexture2"), 1);
 		
 		glUniform1f(glGetUniformLocation(shader.Program, "mixValue"), mixValue);
+
+		shader.USE();
+
+		//// T5.1 - EJERCICIO 1:
+		//glm::mat4 model;
+		//model = glm::translate(model, glm::vec3(0, -0.5, 0));
+		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(1.0, 0, 0));
+
+		//// Prespectiva:
+		glm::mat4 proj = glm::perspective(glm::radians(60.0f), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
+		glm::mat4 view;
+		view = glm::lookAt(	glm::vec3(0.0f, 0.0f, -0.3f),	// Si en lugar de -0.3f pongo 5.0f, se ve mejor!
+							glm::vec3(0.0f, 0.0f, 0.0f),
+							glm::vec3(0.0f, 1.0f, 0.0f));
+
+		GLint modelLoc = glGetUniformLocation(shader.Program, "model");
+		GLint viewLoc = glGetUniformLocation(shader.Program, "view");
+		GLint projLoc = glGetUniformLocation(shader.Program, "proj");
+
+		/// END EJERCICIO 1
+
 		glBindVertexArray(VAO);
+		glm::mat4 model_0;
+		model_0 = glm::translate(model_0, CubesPositionBuffer[0]);
+		model_0 = glm::rotate(model_0, glm::radians(cubeAngleX), glm::vec3(1.0f, 0.0f, 0.0f));
+		model_0 = glm::rotate(model_0, glm::radians(cubeAngleY), glm::vec3(0.0f, 1.0f, 0.0f));
 
-		//pintar con lineas
-		if (WIREFRAME) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		}
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		//pintar con triangulos
-		else {
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model_0));
+
+		for (GLuint i = 1; i < 10; i++) {
+			glm::mat4 model;
+			model = glm::translate(model, CubesPositionBuffer[i]);
+			GLfloat angle = glfwGetTime() * 100;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.25f, 0.6f));
+
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+
+			glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		}
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+
+		////pintar con lineas
+		//if (WIREFRAME) {
+		//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//}
+
+		////pintar con triangulos
+		//else {
+		//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//}
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		/*glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
 		glBindVertexArray(0);
 
@@ -272,7 +323,7 @@ int main() {
 	// liberar la memoria de los VAO, EBO y VBO
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	//glDeleteBuffers(1, &EBO);
 
 	// Terminate GLFW, clearing any resources allocated by GLFW.
 	exit(EXIT_SUCCESS);
@@ -288,22 +339,34 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 	{
-		mixValue += 0.1f;
+		/*mixValue += 0.1f;
 		if (mixValue >= 1.0f)
-			mixValue = 1.0f;
+			mixValue = 1.0f;*/
+		cubeAngleX+=3;
 	}
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 	{
-		mixValue -= 0.1f;
+		/*mixValue -= 0.1f;
 		if (mixValue <= 0.0f)
-			mixValue = 0.0f;
+			mixValue = 0.0f;*/
+		cubeAngleX -= 3;
 	}
 	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
 	{
-		rotateValue+=2;
+		/*rotateValue+=2;*/
+		cubeAngleY -= 3;
 	}
 	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS )
 	{
-		rotateValue-=2;
+		/*rotateValue-=2;*/
+		cubeAngleY += 3;
+	}
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	{
+		mixValue = 1.0f;
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	{
+		mixValue = 0.0f;
 	}
 }
