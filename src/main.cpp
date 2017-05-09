@@ -11,6 +11,8 @@
 #include <gtc\matrix_transform.hpp>
 #include <gtc\type_ptr.hpp>
 
+#include "Camera.h"
+
 using namespace std;
 using namespace glm;
 const GLint WIDTH = 800, HEIGHT = 600;
@@ -19,10 +21,26 @@ GLfloat mixValue = 0.2f;
 GLfloat rotateValue = 0;
 GLfloat cubeAngleX = 0.0f;
 GLfloat cubeAngleY = 0.0f;
+glm::vec3 camPos = glm::vec3(0.0f, 0.0f, 3.0f);
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
 const GLchar* vertexPath = "./src/SimpleVertexShader.vertexshader";
 const GLchar* fragmentPath = "./src/SimpleFragmentShader.fragmentshader";
 
+GLfloat prevMouseX = WIDTH/2, prevMouseY = HEIGHT/2;
+bool firstMouseMove = true;
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+float Pitch;
+float Yaw;
+GLfloat fov = 60.0f;
+
+Camera cam = Camera::Camera(camPos, cameraFront, 0.05f, 60.0f);
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+glm::mat4 make_LookAt(glm::vec3 camPos, glm::vec3 camTarget, glm::vec3 upVec);
+void DoMovement(GLFWwindow * window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main() {
 	//initGLFW
@@ -56,6 +74,13 @@ int main() {
 
 	//set function when callback
 	glfwSetKeyCallback(window, key_callback);
+
+	// for cursor movement:
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+
+	// for mouse scrolling:
+	glfwSetScrollCallback(window, scroll_callback);
 
 	//set windows and viewport
 	int screenWidth, screenHeight;
@@ -226,9 +251,17 @@ int main() {
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	//bucle de dibujado
 	while (!glfwWindowShouldClose(window))
 	{
+		GLfloat actualFrame = glfwGetTime();
+		deltaTime = actualFrame - lastFrame;
+		lastFrame = actualFrame;
+		
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 
@@ -258,18 +291,31 @@ int main() {
 
 		shader.USE();
 
-		//// T5.1 - EJERCICIO 1:
-		//glm::mat4 model;
-		//model = glm::translate(model, glm::vec3(0, -0.5, 0));
-		//model = glm::rotate(model, glm::radians(50.0f), glm::vec3(1.0, 0, 0));
+		//// T5.2
 
 		//// Prespectiva:
-		glm::mat4 proj = glm::perspective(glm::radians(60.0f), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
+		glm::mat4 proj = glm::perspective(glm::radians(cam.GetFOV()), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
 		glm::mat4 view;
-		view = glm::lookAt(	glm::vec3(0.0f, 0.0f, -0.3f),	// Si en lugar de -0.3f pongo 5.0f, se ve mejor!
-							glm::vec3(0.0f, 0.0f, 0.0f),
-							glm::vec3(0.0f, 1.0f, 0.0f));
+		//Ejercicio 1:
+		//view = glm::lookAt(	glm::vec3(camPos.x, camPos.y, camPos.z),
+		//	glm::vec3(0.0f, 0.0f, 0.0f),
+		//	glm::vec3(0.0f, 1.0f, 0.0f));
+		GLfloat radio = 8.0f;
+		//GLfloat X = sin(glfwGetTime())*radio;
+		//GLfloat Z = cos(glfwGetTime())*radio;
+		/*view = glm::lookAt(glm::vec3(X, 0.0, Z),
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f));*/
+		GLfloat cameraSpeed = 3.0f * deltaTime;
+		cam.DoMovement(window);
+		/*camPos.x = (sin(glfwGetTime()) * radio)+cameraSpeed;
+		camPos.z = (cos(glfwGetTime()) * radio)+cameraSpeed;*/
 
+		//view = make_LookAt(camPos, glm::vec3(0,0,0), glm::vec3(0,1,0));
+		view = cam.LookAt();
+
+		// END EJERCICIO 1
+		
 		GLint modelLoc = glGetUniformLocation(shader.Program, "model");
 		GLint viewLoc = glGetUniformLocation(shader.Program, "view");
 		GLint projLoc = glGetUniformLocation(shader.Program, "proj");
@@ -330,43 +376,105 @@ int main() {
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+
+	// && action == GLFW_PRESS si queremos que no lo lea para cada iteración.
+
+	if (key == GLFW_KEY_ESCAPE)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-		WIREFRAME = !WIREFRAME;
-		cout << WIREFRAME;
-	}
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	if (key == GLFW_KEY_UP)
 	{
 		/*mixValue += 0.1f;
 		if (mixValue >= 1.0f)
 			mixValue = 1.0f;*/
 		cubeAngleX+=3;
 	}
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	if (key == GLFW_KEY_DOWN)
 	{
 		/*mixValue -= 0.1f;
 		if (mixValue <= 0.0f)
 			mixValue = 0.0f;*/
 		cubeAngleX -= 3;
 	}
-	if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+	if (key == GLFW_KEY_LEFT)
 	{
 		/*rotateValue+=2;*/
 		cubeAngleY -= 3;
 	}
-	if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS )
+	if (key == GLFW_KEY_RIGHT)
 	{
 		/*rotateValue-=2;*/
 		cubeAngleY += 3;
 	}
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+	if (key == GLFW_KEY_1)
 	{
 		mixValue = 1.0f;
 	}
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+	if (key == GLFW_KEY_2)
 	{
 		mixValue = 0.0f;
 	}
+}
+
+glm::mat4 make_LookAt(glm::vec3 camPos, glm::vec3 camTarget, glm::vec3 upVec) {
+	glm::vec3 camDir = glm::normalize(camPos - camTarget);
+	glm::vec3 camRight = glm::normalize(glm::cross(upVec, camDir));
+	glm::vec3 camUp = glm::cross(camDir, camRight);
+
+	glm::mat4 posMat;
+	posMat[3][0] = -camPos.x;
+	posMat[3][1] = -camPos.y;
+	posMat[3][2] = -camPos.z;
+
+	/*	[ 1, 0, 0, -Px ]
+		[ 0, 1, 0, -Py ]
+		[ 0, 0, 1, -Pz ]
+		[ 0, 0, 0,   1 ]*/
+
+	glm::mat4 rotateMat;
+	rotateMat[0][0] = camRight.x;
+	rotateMat[1][0] = camRight.y;
+	rotateMat[2][0] = camRight.z;
+	rotateMat[0][1] = camUp.x;
+	rotateMat[1][1] = camUp.y;
+	rotateMat[2][1] = camUp.z;
+	rotateMat[0][2] = camDir.x;
+	rotateMat[1][2] = camDir.y;
+	rotateMat[2][2] = camDir.z;
+
+	/*	[ Rx, Ry, Rz, 0 ]
+		[ Ux, Uy, Uz, 0 ]
+		[ Dx, Dy, Dz, 0 ]
+		[ 0 , 0 , 0 , 1 ]*/
+
+	return rotateMat * posMat;
+}
+// T5.2 - Ejercicio 2:
+void DoMovement(GLFWwindow * window ) {
+	GLboolean W = glfwGetKey(window, GLFW_KEY_W);
+	GLboolean A = glfwGetKey(window, GLFW_KEY_A);
+	GLboolean S = glfwGetKey(window, GLFW_KEY_S);
+	GLboolean D = glfwGetKey(window, GLFW_KEY_D);
+	
+	if (W) {
+		camPos.z -= 3.0f * deltaTime;
+	}
+	if (A) {
+		camPos.x -= 3.0f * deltaTime;
+	}
+	if (S) {
+		camPos.z += 3.0f * deltaTime;
+	}
+	if (D) {
+		camPos.x += 3.0f * deltaTime;
+	}
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+	cam.MouseMove(window, xpos, ypos);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	cam.MouseScroll(window, xoffset, yoffset);
 }

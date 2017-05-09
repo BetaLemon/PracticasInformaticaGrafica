@@ -1,4 +1,5 @@
 ﻿  main.cpp
-d:\enti\segon - 2016-17\informàtica gràfica\practicas\practica1-f (sistemas de coordenadas)\practica1\src\main.cpp(293): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-  Proyecto.vcxproj -> D:\ENTI\Segon - 2016-17\Informàtica gràfica\Practicas\Practica1-F (Sistemas de coordenadas)\Practica1\Debug\Practica1.exe
-  Proyecto.vcxproj -> D:\ENTI\Segon - 2016-17\Informàtica gràfica\Practicas\Practica1-F (Sistemas de coordenadas)\Practica1\Debug\Practica1.pdb (Full PDB)
+e:\enti\segon - 2016-17\informàtica gràfica\practicas\practica1-g (camara)\practica1\src\main.cpp(261): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+e:\enti\segon - 2016-17\informàtica gràfica\practicas\practica1-g (camara)\practica1\src\main.cpp(339): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+  Proyecto.vcxproj -> E:\ENTI\Segon - 2016-17\Informàtica gràfica\Practicas\Practica1-G (Camara)\Practica1\Debug\Practica1.exe
+  Proyecto.vcxproj -> E:\ENTI\Segon - 2016-17\Informàtica gràfica\Practicas\Practica1-G (Camara)\Practica1\Debug\Practica1.pdb (Full PDB)
