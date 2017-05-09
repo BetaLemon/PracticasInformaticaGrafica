@@ -24,7 +24,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Common\Camera.h" />
     <ClInclude Include="Common\shader.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

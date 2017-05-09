@@ -259,7 +259,7 @@ int main() {
 	while (!glfwWindowShouldClose(window))
 	{
 		GLfloat actualFrame = glfwGetTime();
-		deltaTime = actualFrame - lastFrame;
+		cam.SetDeltatime(actualFrame - lastFrame);
 		lastFrame = actualFrame;
 		
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions

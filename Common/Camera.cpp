@@ -19,16 +19,16 @@ void Camera::DoMovement(GLFWwindow * window) {
 	GLboolean S = glfwGetKey(window, GLFW_KEY_S);
 	GLboolean D = glfwGetKey(window, GLFW_KEY_D);
 	
-	if (W) {
+	if (S) {
 		cameraPos += cameraFront * cameraSpeed;
 	}
-	if (A) {
+	if (D) {
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
-	if (S) {
+	if (W) {
 		cameraPos -= cameraFront * cameraSpeed;
 	}
-	if (D) {
+	if (A) {
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
 }
@@ -40,7 +40,7 @@ void Camera::MouseMove(GLFWwindow* window, double xpos, double ypos) {
 		firstMouse = false;
 	}
 	GLfloat offsetX = xpos - LastMx;
-	GLfloat offsetY = LastMy - ypos;	// Al revés, porque van de abajo a arriba.
+	GLfloat offsetY = ypos - LastMy;	// Al revés, porque van de abajo a arriba.
 	LastMx = xpos;
 	LastMy = ypos;
 
@@ -103,7 +103,7 @@ glm::mat4 Camera::LookAt() {
 
 	/*return rotateMat * posMat;*/
 
-	glm::mat4 lookAtMatrix = glm::lookAt(cameraPos, cameraFront, cameraUp);
+	glm::mat4 lookAtMatrix = glm::lookAt(cameraPos, cameraPos - cameraFront, cameraUp);
 	return lookAtMatrix;
 }
 
