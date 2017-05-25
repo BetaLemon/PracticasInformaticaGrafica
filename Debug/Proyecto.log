@@ -1,10 +1,4 @@
-﻿  Camera.cpp
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(38): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(39): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(42): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(43): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(44): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(45): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
-d:\enti\segon - 2016-17\informàtica gràfica\git\common\camera.cpp(66): warning C4244: '-=': conversion from 'double' to 'GLfloat', possible loss of data
-  Proyecto.vcxproj -> D:\ENTI\Segon - 2016-17\Informàtica gràfica\Git\Debug\Practica1.exe
-  Proyecto.vcxproj -> D:\ENTI\Segon - 2016-17\Informàtica gràfica\Git\Debug\Practica1.pdb (Full PDB)
+﻿  Object.cpp
+e:\yosm\documents\uni\informatica-grafica\infograf2d\practica1\src\object.cpp(239): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Proyecto.vcxproj -> E:\Yosm\Documents\uni\Informatica-grafica\infograf2d\Practica1\Debug\Practica1.exe
+  Proyecto.vcxproj -> E:\Yosm\Documents\uni\Informatica-grafica\infograf2d\Practica1\Debug\Practica1.pdb (Full PDB)
